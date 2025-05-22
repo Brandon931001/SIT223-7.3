@@ -12,23 +12,26 @@ pipeline {
         stage('Test') {
             steps {
                 echo 'Running Unit Tests...'
-                sh 'pytest tests/'
+                sh 'docker run --rm -v $PWD:/app -w /app garage-app pytest tests/'
             }
         }
+
 
         stage('Code Quality') {
             steps {
                 echo 'Running pylint...'
-                sh 'pylint garage.py || true'
+                sh 'docker run --rm -v $PWD:/app -w /app garage-app pylint garage.py || true'
             }
         }
+
 
         stage('Security Scan') {
             steps {
                 echo 'Running Bandit Security Scan...'
-                sh 'bandit -r garage.py || true'
+                sh 'docker run --rm -v $PWD:/app -w /app garage-app bandit -r garage.py || true'
             }
         }
+
 
         stage('Deploy (Staging)') {
             steps {
