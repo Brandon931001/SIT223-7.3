@@ -12,15 +12,22 @@ pipeline {
         stage('Test') {
             steps {
                 echo 'Running Unit Tests...'
-                sh 'docker run --rm -v "$PWD":"$PWD" -w "$PWD" garage-app pytest tests/'
+                script {
+                    def workspace = sh(script: 'pwd', returnStdout: true).trim()
+                    sh "docker run --rm -v \"$workspace\":\"/workspace\" -w /workspace garage-app pytest tests/"
+                }
             }
         }
+
 
 
         stage('Code Quality') {
             steps {
                 echo 'Running pylint...'
-                sh 'docker run --rm -v "$PWD":"$PWD" -w "$PWD" garage-app pylint garage.py || true'
+                script {
+                    def workspace = sh(script: 'pwd', returnStdout: true).trim()
+                    sh "docker run --rm -v \"$workspace\":\"/workspace\" -w /workspace garage-app pylint garage.py || true"
+                }
             }
         }
 
@@ -28,9 +35,13 @@ pipeline {
         stage('Security Scan') {
             steps {
                 echo 'Running Bandit Security Scan...'
-                sh 'docker run --rm -v "$PWD":"$PWD" -w "$PWD" garage-app bandit -r garage.py || true'
+                script {
+                    def workspace = sh(script: 'pwd', returnStdout: true).trim()
+                    sh "docker run --rm -v \"$workspace\":\"/workspace\" -w /workspace garage-app bandit -r garage.py || true"
+                }
             }
         }
+
 
 
         stage('Deploy (Staging)') {
